@@ -23,7 +23,7 @@ from sklearn import linear_model
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-import utils as utils
+import tcav.utils as tcavutils
 
 
 class CAV(object):
@@ -164,7 +164,7 @@ class CAV(object):
         self.concepts, self.bottleneck, acts)
 
     if self.hparams.model_type == 'linear':
-      lm = linear_model.SGDClassifier(alpha=self.hparams.alpha)
+      lm = linear_model.SGDClassifier(alpha=self.hparams.alpha, early_stopping=True, max_iter=100, tol=0.001)
     elif self.hparams.model_type == 'logistic':
       lm = linear_model.LogisticRegression()
     else:
@@ -299,7 +299,7 @@ def get_or_train_cav(concepts,
 
   cav_path = None
   if cav_dir is not None:
-    utils.make_dir_if_not_exists(cav_dir)
+    tcavutils.make_dir_if_not_exists(cav_dir)
     cav_path = os.path.join(
         cav_dir,
         CAV.cav_key(concepts, bottleneck, cav_hparams.model_type,

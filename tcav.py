@@ -21,12 +21,12 @@ One class can perform TCAV for (target, [concept1, concept2,...]).
 """
 from multiprocessing import dummy as multiprocessing
 import time
-from cav import CAV
-from cav import get_or_train_cav
+from tcav.cav import CAV
+from tcav.cav import get_or_train_cav
 import numpy as np
-import run_params
+import tcav.run_params as run_params
 import tensorflow as tf
-import utils
+import tcav.utils as tcavutils
 
 try:
     xrange          # Python 2
@@ -69,7 +69,7 @@ class TCAV(object):
                          cav,
                          class_acts,
                          run_parallel=True,
-                         num_workers=20):
+                         num_workers=10):
     """Compute TCAV score.
 
     Args:
@@ -295,8 +295,8 @@ class TCAV(object):
 
     # take away 1 random experiment if the random counterpart already in random concepts
     all_concepts_concepts, pairs_to_run_concepts = (
-        utils.process_what_to_run_expand(
-            utils.process_what_to_run_concepts(target_concept_pairs),
+        tcavutils.process_what_to_run_expand(
+            tcavutils.process_what_to_run_concepts(target_concept_pairs),
             self.random_counterpart,
             num_random_exp=num_random_exp - (1 if random_concepts and
                   self.random_counterpart in random_concepts else 0),
@@ -314,8 +314,8 @@ class TCAV(object):
       # TODO random500_1 vs random500_0 is the same as 1 - (random500_0 vs random500_1)
       for i in xrange(num_random_exp):
         all_concepts_randoms_tmp, pairs_to_run_randoms_tmp = (
-            utils.process_what_to_run_expand(
-                utils.process_what_to_run_randoms(target_concept_pairs,
+            tcavutils.process_what_to_run_expand(
+                tcavutils.process_what_to_run_randoms(target_concept_pairs,
                                                   get_random_concept(i)),
                 num_random_exp=num_random_exp - 1,
                 random_concepts=random_concepts))
@@ -326,13 +326,13 @@ class TCAV(object):
     else:
       # run only random_counterpart as the positve set for random experiments
       all_concepts_randoms_tmp, pairs_to_run_randoms_tmp = (
-          utils.process_what_to_run_expand(
-              utils.process_what_to_run_randoms(target_concept_pairs,
+          tcavutils.process_what_to_run_expand(
+              tcavutils.process_what_to_run_randoms(target_concept_pairs,
                                                 self.random_counterpart),
               self.random_counterpart,
               num_random_exp=num_random_exp - (1 if random_concepts and
                   self.random_counterpart in random_concepts else 0),
-              random_concepts=random_concepts))
+              random_concepts=random_concepts)) 
 
       pairs_to_run_randoms.extend(pairs_to_run_randoms_tmp)
       all_concepts_randoms.extend(all_concepts_randoms_tmp)
